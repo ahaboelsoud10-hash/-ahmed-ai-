@@ -1,0 +1,13 @@
+{
+  "name": "ahmed-ai",
+  "version": "1.0.0",
+  "description": "AHMED AI Chatbot Website",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "keywords": ["AI", "Chatbot"],
+  "author": "Ahmed Aboelsoud",
+  "license": "MIT"
+}
