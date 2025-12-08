@@ -1,0 +1,30 @@
+body {
+  background: linear-gradient(135deg, #000, #222, #000);
+  color: white;
+  font-family: "Tahoma";
+  text-align: center;
+}
+
+.container {
+  margin-top: 40px;
+}
+
+input {
+  width: 300px;
+  padding: 10px;
+  font-size: 18px;
+  border-radius: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  font-size: 18px;
+  border-radius: 10px;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.made {
+  font-size: 14px;
+  opacity: 0.7;
+}
