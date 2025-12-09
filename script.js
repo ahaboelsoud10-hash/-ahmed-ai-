@@ -187,53 +187,50 @@ function cleanText(text) {
     .trim();
 }
 
-// نسبة التشابه محسّنة
-function similarity(s1, s2) {
-  s1 = cleanText(s1);
-  s2 = cleanText(s2);
-
-  // البحث عن كلمات مشتركة
-  const words1 = s1.split(' ').filter(w => w.length > 0);
-  const words2 = s2.split(' ').filter(w => w.length > 0);
+// دالة البحث المحسّنة
+function findBestMatch(input) {
+  const cleaned = cleanText(input);
+  const words = cleaned.split(/\s+/).filter(w => w.length > 0);
   
-  let commonWords = 0;
-  words2.forEach(w2 => {
-    if (words1.some(w1 => w1.includes(w2) || w2.includes(w1))) {
-      commonWords++;
+  let bestMatch = null;
+  let bestScore = 0;
+  
+  qa.forEach(item => {
+    const qCleaned = cleanText(item.q);
+    const qWords = qCleaned.split(/\s+/).filter(w => w.length > 0);
+    
+    // عد الكلمات المتطابقة
+    let matchCount = 0;
+    words.forEach(w => {
+      if (qWords.some(qw => qw === w || qw.includes(w) || w.includes(qw))) {
+        matchCount++;
+      }
+    });
+    
+    // حساب نسبة التطابق
+    const score = words.length > 0 ? matchCount / words.length : 0;
+    
+    if (score > bestScore) {
+      bestScore = score;
+      bestMatch = item.a;
     }
   });
   
-  // نسبة الكلمات المشتركة
-  const wordScore = commonWords / Math.max(words1.length, words2.length);
-  
-  // نسبة الأحرف المتطابقة
-  let charMatch = 0;
-  for (let i = 0; i < Math.min(s1.length, s2.length); i++) {
-    if (s1[i] === s2[i]) charMatch++;
-  }
-  const charScore = charMatch / Math.max(s1.length, s2.length);
-  
-  // الجمع بين النسبتين (الكلمات أهم)
-  return (wordScore * 0.7) + (charScore * 0.3);
+  return bestMatch;
 }
 
 function getAnswer() {
   const input = document.getElementById("question").value;
-  if (input.trim() === "") {
+  if (!input || input.trim() === "") {
     document.getElementById("answer").innerText = "من فضلك اكتب سؤال! 😊";
     return;
   }
   
-  const cleaned = cleanText(input);
-
-  let best = { score: 0, answer: "  ❤️سامحني يا صديقي ممكن احمد مقاليش علي السؤال ده لسه احمد بيدربني علي اجابه الاسئله ممكن تقولي حاجه شبيهه لسؤالك  اقدر اجاوب عليها " };
-
-  qa.forEach(item => {
-    const score = similarity(cleaned, item.q);
-    if (score > best.score && score >= 0.25) {
-      best = { score, answer: item.a };
-    }
-  });
-
-  document.getElementById("answer").innerText = best.answer;
+  const answer = findBestMatch(input);
+  
+  if (answer && answer.trim()) {
+    document.getElementById("answer").innerText = answer;
+  } else {
+    document.getElementById("answer").innerText = "❤️ سامحني يا صديقي، ما أعرفش إجابة على السؤال ده. جرب تسأل عن حاجة تانية! 😊";
+  }
 }
