@@ -187,27 +187,50 @@ function cleanText(text) {
     .trim();
 }
 
-// نسبة التشابه
+// نسبة التشابه محسّنة
 function similarity(s1, s2) {
   s1 = cleanText(s1);
   s2 = cleanText(s2);
 
-  let match = 0;
+  // البحث عن كلمات مشتركة
+  const words1 = s1.split(' ').filter(w => w.length > 0);
+  const words2 = s2.split(' ').filter(w => w.length > 0);
+  
+  let commonWords = 0;
+  words2.forEach(w2 => {
+    if (words1.some(w1 => w1.includes(w2) || w2.includes(w1))) {
+      commonWords++;
+    }
+  });
+  
+  // نسبة الكلمات المشتركة
+  const wordScore = commonWords / Math.max(words1.length, words2.length);
+  
+  // نسبة الأحرف المتطابقة
+  let charMatch = 0;
   for (let i = 0; i < Math.min(s1.length, s2.length); i++) {
-    if (s1[i] === s2[i]) match++;
+    if (s1[i] === s2[i]) charMatch++;
   }
-  return match / Math.max(s1.length, s2.length);
+  const charScore = charMatch / Math.max(s1.length, s2.length);
+  
+  // الجمع بين النسبتين (الكلمات أهم)
+  return (wordScore * 0.7) + (charScore * 0.3);
 }
 
 function getAnswer() {
   const input = document.getElementById("question").value;
+  if (input.trim() === "") {
+    document.getElementById("answer").innerText = "من فضلك اكتب سؤال! 😊";
+    return;
+  }
+  
   const cleaned = cleanText(input);
 
   let best = { score: 0, answer: "  ❤️سامحني يا صديقي ممكن احمد مقاليش علي السؤال ده لسه احمد بيدربني علي اجابه الاسئله ممكن تقولي حاجه شبيهه لسؤالك  اقدر اجاوب عليها " };
 
   qa.forEach(item => {
     const score = similarity(cleaned, item.q);
-    if (score > best.score && score >= 0.35) {
+    if (score > best.score && score >= 0.25) {
       best = { score, answer: item.a };
     }
   });
